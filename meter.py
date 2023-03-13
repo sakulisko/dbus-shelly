@@ -83,8 +83,11 @@ class Meter(object):
 		self.service.add_item(TextItem('/Mgmt/ProcessName', MAIN_FILE))
 		self.service.add_item(TextItem('/Mgmt/ProcessVersion', VERSION))
 		self.service.add_item(TextItem('/Mgmt/Connection', f"WebSocket {host}:{port}"))
+
+
 		self.service.add_item(IntegerItem('/DeviceInstance', instance))
 		self.service.add_item(IntegerItem('/ProductId', 0xB034, text=unit_productid))
+		self.service.add_item(IntegerItem('/DeviceType', 345)) # found on https://www.sascha-curth.de/projekte/005_Color_Control_GX.html#experiment - should be an ET340 Engerie Meter
 		self.service.add_item(TextItem('/ProductName', "Shelly energy meter"))
 		self.service.add_item(TextItem('/FirmwareVersion', fw))
 		self.service.add_item(IntegerItem('/Connected', 1))
@@ -140,8 +143,11 @@ class Meter(object):
 					s['/Ac/L1/Power'] = d["a_act_power"]
 					s['/Ac/L2/Power'] = d["b_act_power"]
 					s['/Ac/L3/Power'] = d["c_act_power"]
+					acPower = d["total_act_power"]
+					s['Ac/Power'] = acPower
 
-					s['/Ac/Power'] = d["a_act_power"] + d["b_act_power"] + d["c_act_power"]
+					
+					# s['/Ac/Power'] = d["a_act_power"] + d["b_act_power"] + d["c_act_power"]
 
 			try:
 				d = data['params']['emdata:0']
