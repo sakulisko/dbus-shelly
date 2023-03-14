@@ -109,6 +109,8 @@ class Meter(object):
 		self.service.add_item(DoubleItem('/Ac/Energy/Forward', None, text=unit_kwh))
 		self.service.add_item(DoubleItem('/Ac/Energy/Reverse', None, text=unit_kwh))
 		self.service.add_item(DoubleItem('/Ac/Power', None, text=unit_watt))
+		self.service.add_item(DoubleItem('/Ac/Current', 0, text=unit_amp))
+		self.service.add_item(DoubleItem('/Ac/Voltage', 0, text=unit_volt))
 		for prefix in (f"/Ac/L{x}" for x in range(1, 4)):
 			self.service.add_item(DoubleItem(prefix + '/Voltage', None, text=unit_volt))
 			self.service.add_item(DoubleItem(prefix + '/Current', None, text=unit_amp))
@@ -144,7 +146,7 @@ class Meter(object):
 					s['/Ac/L2/Power'] = d["b_act_power"]
 					s['/Ac/L3/Power'] = d["c_act_power"]
 					acPower = d["total_act_power"]
-					s['Ac/Power'] = acPower
+					s['/Ac/Power'] = acPower
 
 					
 					# s['/Ac/Power'] = d["a_act_power"] + d["b_act_power"] + d["c_act_power"]
