@@ -92,6 +92,7 @@ class Meter(object):
 		self.service.add_item(TextItem('/FirmwareVersion', fw))
 		self.service.add_item(IntegerItem('/Connected', 1))
 		self.service.add_item(IntegerItem('/RefreshTime', 100))
+		self.service.add_item(IntegerItem('/UpdateIndex', 0))
 
 		# Role
 		self.service.add_item(TextArrayItem('/AllowedRoles',
@@ -129,12 +130,14 @@ class Meter(object):
 	
 	async def update(self, data):
 		# NotifyStatus has power, current, voltage and energy values
+		logger.debug(data)
 		if self.service and data.get('method') == 'NotifyStatus':
 			try:
 				d = data['params']['em:0']
 			except KeyError:
 				pass
 			else:
+				logger.debug("process em:0")
 				with self.service as s:
 					s['/Ac/L1/Voltage'] = d["a_voltage"]
 					s['/Ac/L2/Voltage'] = d["b_voltage"]
@@ -156,6 +159,7 @@ class Meter(object):
 			except KeyError:
 				pass
 			else:
+				logger.debug("process emdata:0")
 				with self.service as s:
 					s["/Ac/Energy/Forward"] = round(d["total_act"]/1000, 1)
 					s["/Ac/Energy/Reverse"] = round(d["total_act_ret"]/1000, 1)
@@ -165,6 +169,7 @@ class Meter(object):
 					s["/Ac/L2/Energy/Reverse"] = round(d["b_total_act_ret_energy"]/1000, 1)
 					s["/Ac/L3/Energy/Forward"] = round(d["c_total_act_energy"]/1000, 1)
 					s["/Ac/L3/Energy/Reverse"] = round(d["c_total_act_ret_energy"]/1000, 1)
+					s['/UpdateIndex'] = (s['/UpdateIndex'] + 1 ) % 256
 
 	def role_instance(self, value):
 		val = value.split(':')
